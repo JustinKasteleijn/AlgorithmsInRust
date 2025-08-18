@@ -27,9 +27,6 @@ pub fn find_best_route(
     let from_source = dijkstra(graph, source);
     let from_dest = dijkstra(&graph.flip(), target);
 
-    println!("{:?}", from_source);
-    println!("{:?}", from_dest);
-
     roads
         .iter()
         .map(|(from, edge)| {

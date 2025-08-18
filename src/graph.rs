@@ -26,17 +26,24 @@ impl Graph {
     }
 
     pub fn flip(&self) -> Graph {
-        let mut rev_adj = vec![Vec::new(); self.adj_list.len()];
+        let mut flipped = vec![Vec::new(); self.adj_list.len()];
 
-        for (u, edges) in self.adj_list.iter().enumerate() {
-            for edge in edges {
-                rev_adj[edge.to as usize].push(Edge {
-                    to: u as u32,
-                    cost: edge.cost,
-                });
-            }
-        }
+        self.adj_list
+            .iter()
+            .enumerate()
+            .flat_map(|(i, edges)| {
+                edges.iter().map(move |edge| {
+                    (
+                        edge.to as usize,
+                        Edge {
+                            to: i as u32,
+                            cost: edge.cost,
+                        },
+                    )
+                })
+            })
+            .for_each(|(to, edge)| flipped[to].push(edge));
 
-        Graph { adj_list: rev_adj }
+        return Graph { adj_list: flipped };
     }
 }
