@@ -1,57 +1,36 @@
-use crate::graph::Graph;
+use crate::graph::{Edge, Graph};
 
-use std::cmp::Ordering;
+use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
 type Vertex = u32;
 
-#[derive(Copy, Clone, Eq, PartialEq)]
-struct State {
-    cost: u32,
-    position: u32,
-}
-
-impl Ord for State {
-    fn cmp(&self, other: &Self) -> Ordering {
-        other
-            .cost
-            .cmp(&self.cost)
-            .then_with(|| self.position.cmp(&other.position))
-    }
-}
-
-impl PartialOrd for State {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(&other))
-    }
-}
-
 pub fn dijkstra(graph: &Graph, source: Vertex) -> Vec<u32> {
-    let mut heap = BinaryHeap::new();
-    let mut distances = (0..graph.adj_list.len())
+    let mut heap: BinaryHeap<Reverse<Edge>> = BinaryHeap::new();
+    let mut distances: Vec<u32> = (0..graph.adj_list.len())
         .map(|_| u32::MAX)
         .collect::<Vec<u32>>();
 
     distances[source as usize] = 0;
-    heap.push(State {
-        position: source,
+    heap.push(Reverse(Edge {
+        to: source,
         cost: 0,
-    });
+    }));
 
-    while let Some(State { position, cost }) = heap.pop() {
-        if cost > distances[position as usize] {
+    while let Some(Reverse(Edge { to, cost })) = heap.pop() {
+        if cost > distances[to as usize] {
             continue;
         }
 
-        for edge in graph.find_edges(position) {
-            let next = State {
+        for edge in graph.find_edges(to) {
+            let next = Edge {
                 cost: cost + edge.cost,
-                position: edge.to,
+                to: edge.to,
             };
 
-            if next.cost < distances[next.position as usize] {
-                heap.push(next);
-                distances[next.position as usize] = next.cost
+            if next.cost < distances[next.to as usize] {
+                heap.push(Reverse(next));
+                distances[next.to as usize] = next.cost
             }
         }
     }

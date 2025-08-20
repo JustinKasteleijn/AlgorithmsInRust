@@ -1,6 +1,6 @@
 type Vertex = u32;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Edge {
     pub to: Vertex,
     pub cost: u32,
